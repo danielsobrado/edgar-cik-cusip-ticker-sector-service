@@ -22,8 +22,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.apache.httpcomponents:fluent-hc:4.5.14'
-	implementation 'mysql:mysql-connector-java:5.1.13'
+	implementation 'mysql:mysql-connector-java:8.0.32'
 	implementation 'org.projectlombok:lombok:1.18.24'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'io.vavr:vavr:0.10.4'
