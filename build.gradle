@@ -1,0 +1,38 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.5'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.jds.edgar.cik'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url 'https://repository.apache.org/content/repositories/releases/'
+	}
+}
+
+dependencies {
+	implementation 'org.apache.httpcomponents:fluent-hc:4.5.14'
+	implementation 'mysql:mysql-connector-java:5.1.13'
+	implementation 'org.projectlombok:lombok:1.18.24'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'io.vavr:vavr:0.10.4'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testAnnotationProcessor "org.projectlombok:lombok:1.18.24"
+}
+
+test {
+	useJUnitPlatform()
+}
