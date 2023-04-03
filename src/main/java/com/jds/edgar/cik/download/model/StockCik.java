@@ -38,4 +38,15 @@ public class StockCik {
     @UpdateTimestamp
     private LocalDateTime updated;
 
+    public StockCik copy() {
+        return StockCik.builder()
+                .cik(this.cik)
+                .ticker(this.ticker)
+                .exchange(this.exchange)
+                .title(this.title)
+                .updated(this.updated)
+                .created(this.created)
+                .build();
+    }
+
 }

@@ -38,8 +38,8 @@ FLUSH PRIVILEGES;
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/danielsobrado/cik-conversion.git
-cd edgar-cik-conversion
+git clone https://github.com/danielsobrado/edgar-cik-ticker-service.git
+cd edgar-cik-ticker-service
 ```
 
 2. Update the src/main/resources/application.yml file with your MySQL connection information.

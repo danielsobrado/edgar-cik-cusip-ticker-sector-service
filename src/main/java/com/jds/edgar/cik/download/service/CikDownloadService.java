@@ -7,7 +7,6 @@ import com.jds.edgar.cik.download.repository.CikRepository;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.net.HttpURLConnection;
@@ -23,7 +22,7 @@ public class CikDownloadService {
     private final EdgarConfig edgarConfig;
     private final CikRepository cikRepository;
 
-    @Scheduled(cron = "${edgar.cik-exchange-update-cron}")
+//    @Scheduled(cron = "${edgar.cik-update-cron}")
     public void updateCikData() {
         Try.of(() -> new URL(edgarConfig.getCompanyTickersUrl()))
                 .mapTry(url -> url.openConnection())
@@ -47,7 +46,9 @@ public class CikDownloadService {
                         .title((String) value.get("title"))
                         .build();
                 cikRepository.save(newStockCik);
+                log.info("New StockCik object saved: {}", newStockCik);
             } else {
+                StockCik originalStockCik = stockCik.copy();
                 boolean updated = false;
 
                 if (!stockCik.getTicker().equals(value.get("ticker"))) {
@@ -64,8 +65,11 @@ public class CikDownloadService {
                     stockCik.setUpdated(LocalDateTime.now());
                     cikRepository.save(stockCik);
                     log.warn("CIK {} has been updated", cik);
+                    log.info("StockCik object before update: {}", originalStockCik);
+                    log.info("StockCik object after update: {}", stockCik);
                 }
             }
         });
     }
+
 }
