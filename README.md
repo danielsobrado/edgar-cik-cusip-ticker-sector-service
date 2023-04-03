@@ -57,3 +57,8 @@ cd edgar-cik-conversion
 ```
 
 The service will start and automatically download and update CIK data based on the specified cron expressions in the application.yml file.
+
+## Endpoints
+* GET /api/stocks/cik/{cik}: Retrieves the stock information by CIK.
+* GET /api/stocks/ticker/{ticker}: Retrieves the stock information by ticker.
+Both endpoints return a JSON object with the stock information if found, or a 404 status code if the CIK or ticker is not found.
