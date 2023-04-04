@@ -1,0 +1,35 @@
+graph LR
+A[Client] -->|Request| B1[REST API]
+B1 --> C1[StockCikController]
+C1 --> D1[CikRepository]
+D1 --> E1[Database]
+E1 --> D1
+D1 --> C1
+C1 --> B1
+B1 -->|Response| A
+
+F[Scheduled Tasks] --> J[EdgarSectorEnrichService]
+F[Scheduled Tasks] --> G[SecDownloadService]
+G --> D1
+G --> H1[ProcessExecutionRepository]
+H1 --> E1
+
+C1 --> J[EdgarSectorEnrichService]
+J --> D1
+
+classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
+classDef api fill:#9fdaff,stroke:#333,stroke-width:1px;
+classDef controller fill:#7ee37c,stroke:#333,stroke-width:1px;
+classDef repository fill:#ffcb6a,stroke:#333,stroke-width:1px;
+classDef database fill:#f99696,stroke:#333,stroke-width:1px;
+classDef scheduled fill:#c8a6f0,stroke:#333,stroke-width:1px;
+classDef service fill:#f6c474,stroke:#333,stroke-width:1px;
+
+class B1 api;
+class C1 controller;
+class D1 repository;
+class E1 database;
+class F scheduled;
+class G service;
+class H1 repository;
+class J service
