@@ -33,7 +33,7 @@ public class CikExchangeDownloadServiceTest {
     private CikRepository cikRepository;
 
     @InjectMocks
-    private CikExchangeDownloadService cikExchangeDownloadService;
+    private CikExchangeDownloadServiceImpl cikExchangeDownloadService;
 
     private LinkedHashMap<String, Object> testData;
 
@@ -55,7 +55,7 @@ public class CikExchangeDownloadServiceTest {
         when(edgarConfig.getCompanyTickersExchangeUrl()).thenReturn("classpath:company_tickers_exchange_test.json");
         when(cikRepository.findById(any())).thenReturn(Optional.of(mock(StockCik.class)));
 
-        cikExchangeDownloadService.updateCikExchangeData();
+        cikExchangeDownloadService.downloadCikData();
 
         verify(cikRepository, atLeastOnce()).save(any(StockCik.class));
     }

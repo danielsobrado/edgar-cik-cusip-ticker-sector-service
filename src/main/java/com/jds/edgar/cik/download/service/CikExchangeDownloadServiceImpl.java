@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,13 +20,17 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CikExchangeDownloadService {
+public class CikExchangeDownloadServiceImpl implements CikDownloadService {
 
     private final EdgarConfig edgarConfig;
     private final CikRepository cikRepository;
 
+    @Override
     @Scheduled(cron = "${edgar.cik-exchange-update-cron}")
-    public void updateCikExchangeData() {
+    @Transactional
+    public void downloadCikData() {
+        log.info("Started to download CIK data from: {}", edgarConfig.getCompanyTickersExchangeUrl());
+
         Try.of(() -> new URL(edgarConfig.getCompanyTickersExchangeUrl()))
                 .mapTry(URL::openConnection)
                 .mapTry(con -> (HttpURLConnection) con)

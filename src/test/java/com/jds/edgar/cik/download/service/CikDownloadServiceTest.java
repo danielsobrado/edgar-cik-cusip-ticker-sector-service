@@ -34,7 +34,7 @@ public class CikDownloadServiceTest {
     private CikRepository cikRepository;
 
     @InjectMocks
-    private CikDownloadService cikDownloadService;
+    private CikDownloadServiceImpl cikDownloadService;
 
     private Map<String, Map<String, Object>> testData;
 
@@ -54,7 +54,7 @@ public class CikDownloadServiceTest {
         when(edgarConfig.getCompanyTickersUrl()).thenReturn("classpath:company_tickers_test.json");
         when(cikRepository.findById(any())).thenReturn(Optional.empty());
 
-        cikDownloadService.updateCikData();
+        cikDownloadService.downloadCikData();
 
         verify(cikRepository, atLeastOnce()).save(any(StockCik.class));
     }
@@ -64,7 +64,7 @@ public class CikDownloadServiceTest {
         when(edgarConfig.getCompanyTickersUrl()).thenReturn("classpath:company_tickers_test.json");
         when(cikRepository.findById(any())).thenReturn(Optional.of(mock(StockCik.class)));
 
-        cikDownloadService.updateCikData();
+        cikDownloadService.downloadCikData();
 
         verify(cikRepository, atLeastOnce()).save(any(StockCik.class));
     }

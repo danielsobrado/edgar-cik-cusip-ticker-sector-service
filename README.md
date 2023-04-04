@@ -24,7 +24,7 @@ All the configuration settings can be found in the src/main/resources/applicatio
 
 Install MySQL and create a Database:
 
-```
+```SQL
 CREATE DATABASE edgar;
 
 CREATE USER 'edgar_user'@'%' IDENTIFIED BY 'password';
@@ -33,6 +33,23 @@ GRANT ALL PRIVILEGES ON edgar.* TO 'edgar_user'@'%';
 
 FLUSH PRIVILEGES;
 ```
+
+Or use the following for Postgres:
+
+```SQL
+CREATE DATABASE edgar;
+
+CREATE USER edgar_user WITH ENCRYPTED PASSWORD 'password';
+
+GRANT ALL PRIVILEGES ON DATABASE edgar TO edgar_user;
+
+ALTER USER edgar_user CREATEDB;
+```
+
+And the following connection string in your `application.properties`.
+
+`jdbc:postgresql://localhost:5432/edgar`
+
 
 ## Getting Started
 1. Clone the repository:
