@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CikRepository extends JpaRepository<StockCik, String> {
+public interface CikRepository extends JpaRepository<StockCik, Long> {
     Optional<StockCik> findByTicker(String ticker);
 }

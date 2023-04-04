@@ -20,7 +20,7 @@ public class StockCikController {
     private CikRepository cikRepository;
 
     @GetMapping("/cik/{cik}")
-    public ResponseEntity<StockCik> getByCik(@PathVariable String cik) {
+    public ResponseEntity<StockCik> getByCik(@PathVariable Long cik) {
         Optional<StockCik> stockCikOptional = cikRepository.findById(cik);
         return stockCikOptional.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());

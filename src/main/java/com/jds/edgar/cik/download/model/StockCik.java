@@ -1,6 +1,7 @@
 package com.jds.edgar.cik.download.model;
 
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,17 +19,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class StockCik {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
+    @Id
+    private Long cik;
+
+    @Nonnull
     private String ticker;
 
     private String title;
 
     private String exchange;
-
-    private String cik;
 
     @Column(name = "created_at")
     @CreationTimestamp

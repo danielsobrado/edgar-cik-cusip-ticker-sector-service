@@ -79,3 +79,6 @@ The service will start and automatically download and update CIK data based on t
 * GET /api/stocks/cik/{cik}: Retrieves the stock information by CIK.
 * GET /api/stocks/ticker/{ticker}: Retrieves the stock information by ticker.
 Both endpoints return a JSON object with the stock information if found, or a 404 status code if the CIK or ticker is not found.
+
+## Process Execution Tracking
+This application keeps track of the last execution time of the CIK data update process. The purpose of this tracking is to ensure that the process is executed immediately if the last execution date is more than one month ago, or if the tracking table is empty (e.g., the application is run for the first time).
