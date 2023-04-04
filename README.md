@@ -11,7 +11,7 @@ This project is a Spring Boot-based service that downloads and updates CIK (Cent
 * Java 17
 * MySQL 8
 
-## Confguration
+## Configuration
 Configuration
 All the configuration settings can be found in the src/main/resources/application.yml file. You can change the following properties:
 
