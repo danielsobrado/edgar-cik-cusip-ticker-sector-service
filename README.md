@@ -1,11 +1,22 @@
 # Edgar CIK Downloader
-This project is a Spring Boot-based service that downloads and updates CIK (Central Index Key) data from the SEC (U.S. Securities and Exchange Commission) for public companies. The service stores the CIK data in a MySQL database and supports enrichment with stock exchange information.
+This project is a Spring Boot-based service that downloads and updates CIK (Central Index Key) data from the SEC (U.S. Securities and Exchange Commission) for public companies. 
+
+The service stores the CIK data in a RDBS (e.g. MySQL) database and supports enrichment with stock exchange information.
+
+There are endpoints to retrieve the CIK data by CIK or ticker.
+
+A cron expression is used to schedule the CIK data update process.
+
+![Diagram](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/FromMySQLWorkbench.PNG)
 
 ## Features
 * Download CIK data from the SEC and store it in a MySQL database.
-* Update CIK data with stock exchange information.
+* 2 sources of CIK data, one with stock exchange information.
 * Scheduled CIK data updates using cron expressions.
 * Configurable properties for URLs and scheduling.
+* Retrieve stock information by CIK or ticker through RESTful API endpoints.
+* Monitor and log CIK data updates and process executions.
+* Utilize OpenAPI/Swagger for API documentation and testing.
 
 ## Requirements
 * Java 17
