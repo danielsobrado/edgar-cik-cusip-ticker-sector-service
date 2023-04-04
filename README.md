@@ -7,7 +7,7 @@ There are endpoints to retrieve the CIK data by CIK or ticker.
 
 A cron expression is used to schedule the CIK data update process.
 
-![Diagram](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/FromMySQLWorkbench.PNG)
+![Diagram](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/ca007c90c25fa370765b3b4b624296a6fb534a87/doc/images/Diagram.PNG)
 
 ## Features
 * Download CIK data from the SEC and store it in a MySQL database.
