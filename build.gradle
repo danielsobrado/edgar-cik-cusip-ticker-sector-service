@@ -28,6 +28,9 @@ dependencies {
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.3'
+	implementation 'javax.servlet:javax.servlet-api:3.1.0'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
