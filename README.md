@@ -23,15 +23,30 @@ A cron expression is used to schedule the CIK data update process.
 * MySQL 8
 
 ## Configuration
-Configuration
-All the configuration settings can be found in the src/main/resources/application.yml file. You can change the following properties:
+All the configuration settings can be found in the `src/main/resources/application.yml` file. You can change the following properties:
 
 * `edgar.company-tickers-url`: URL for downloading the company tickers JSON data.
+  * Default value: `https://www.sec.gov/files/company_tickers.json`
 * `edgar.company-tickers-exchange-url`: URL for downloading the company tickers with exchange JSON data.
+  * Default value: `https://www.sec.gov/files/company_tickers_exchange.json`
+* `edgar.enrich-sector-url`: URL for enriching the sector data based on the CIK value.
+  * Default value: `https://www.sec.gov/cgi-bin/browse-edgar?CIK={cik}`
 * `edgar.cik-update-cron`: Cron expression for scheduling CIK data updates.
+  * Default value: `0 0 0 1 * ?`
 * `edgar.cik-exchange-update-cron`: Cron expression for scheduling CIK data updates with exchange information.
-* `edgar.use-tickers`: Enable or disable this downloader
-* `edgar.use-tickers-exchange`: Enable or disable this downloader
+  * Default value: `0 */20 * * * *`
+* `edgar.unenriched-cron`: Cron expression for scheduling the enrichment of unenriched CIKs.
+  * Default value: `0 0 0 * * *`
+* `edgar.sector-enrich-cron`: Cron expression for scheduling the enrichment of sector data.
+  * Default value: `0 0/10 * * * *`
+* `edgar.use-tickers`: Enable or disable the company tickers downloader.
+  * Default value: `false`
+* `edgar.use-tickers-exchange`: Enable or disable the company tickers with exchange downloader.
+  * Default value: `true`
+* `edgar.use-sector-enrich`: Enable or disable the sector enrichment feature.
+  * Default value: `true`
+
+You can modify these properties according to your requirements. For example, you may change the cron expressions to adjust the frequency of scheduled tasks or enable/disable certain features of the application.
 
 ## Database
 
