@@ -92,9 +92,11 @@ cd edgar-cik-ticker-service
 The service will start and automatically download and update CIK data based on the specified cron expressions in the application.yml file.
 
 ## Endpoints
-* GET /api/stocks/cik/{cik}: Retrieves the stock information by CIK.
-* GET /api/stocks/ticker/{ticker}: Retrieves the stock information by ticker.
-Both endpoints return a JSON object with the stock information if found, or a 404 status code if the CIK or ticker is not found.
+* GET `/api/stocks/cik/{cik}`: Retrieves the stock information by CIK.
+* GET `/api/stocks/ticker/{ticker}`: Retrieves the stock information by ticker. 
+* GET `/api/stocks/sector/{sector}`: Retrieves a list of stock information by sector. 
+* GET `/api/stocks/sic/{sic}`: Retrieves a list of stock information by SIC code (tag).
+  All endpoints return a JSON object or a list of JSON objects with the stock information if found or a 404 status code if the CIK, ticker, sector, or SIC code is not found.
 
 Example of end point use:
 
@@ -102,6 +104,15 @@ Example of end point use:
 
 ## Process Execution Tracking
 This application keeps track of the last execution time of the CIK data update process. The purpose of this tracking is to ensure that the process is executed immediately if the last execution date is more than one month ago, or if the tracking table is empty (e.g., the application is run for the first time).
+
+## Enrichment
+A CIK can be enhanced utilizing a REST API endpoint using another service that scrapes Edgar to provide further data. The maximum rate for this service will be one inquiry per ten seconds.
+We'll have a scheduled procedure that will check the database for entries that haven't been enriched and enrich them one at a time using a cron job that can be configured.
+Using configuration we can determine whether to enable this service or not.
+
+The number of unenriched records in the system will be counted by another scheduled activity, which will run once every day. The previous scrapper won't need to be run if there are no records to be enriched.
+
+![Diagram 2](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/22dffc0865942e39cce197e3ce53a1981631710f/doc/images/Diagram2.PNG)
 
 ## Notes
 * The CIK data is updated every month, so the cron expression for the CIK data update process should be set to run once a month.
