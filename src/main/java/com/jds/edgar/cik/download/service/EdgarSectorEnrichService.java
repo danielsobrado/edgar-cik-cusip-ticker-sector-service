@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -62,16 +64,20 @@ public class EdgarSectorEnrichService {
         }
 
         String sic = doc.select("p.identInfo a").first().ownText().strip();
-        String sector = doc.select("p.identInfo").first().ownText();
 
-        int sicIndex = sector.indexOf("SIC:");
-        int stateLocationIndex = sector.indexOf("State location:");
+        String sectorText = doc.select("p.identInfo").first().text();
+        Pattern pattern = Pattern.compile("SIC: \\d{4} - (.*?) State location:");
+        Matcher matcher = pattern.matcher(sectorText);
 
-        // Check if the SIC: substring is present in the text before performing the substring operation
-        if (sicIndex != -1 && stateLocationIndex != -1) {
-            sector = sector.substring(sicIndex + 4, stateLocationIndex).strip();
-        } else {
-            sector = "Not Available";
+        String sector = "Not Available";
+        if (matcher.find()) {
+            sector = matcher.group(1).strip();
+        }
+
+        // Truncate the sector string to fit the database column
+        int maxSectorLength = 100;
+        if (sector.length() > maxSectorLength) {
+            sector = sector.substring(0, maxSectorLength);
         }
 
         return StockCik.EnrichedData.builder()
