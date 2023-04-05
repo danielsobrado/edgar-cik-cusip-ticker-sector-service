@@ -16,8 +16,15 @@ configurations {
 
 repositories {
 	mavenCentral()
+	jcenter()
 	maven {
 		url 'https://repository.apache.org/content/repositories/releases/'
+	}
+	maven {
+		url 'https://oss.sonatype.org/content/repositories/snapshots'
+	}
+	maven {
+		url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 	}
 }
 
@@ -31,6 +38,9 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.3'
 	implementation 'javax.servlet:javax.servlet-api:3.1.0'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.jsoup:jsoup:1.14.3'
+	implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
+	implementation 'com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.8.1'
 
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 

@@ -28,6 +28,10 @@ public class StockCik {
 
     private String title;
 
+    private String sic;
+
+    private String sector;
+
     private String exchange;
 
     @Column(name = "created_at")
@@ -44,9 +48,24 @@ public class StockCik {
                 .ticker(this.ticker)
                 .exchange(this.exchange)
                 .title(this.title)
+                .sic(this.sic)
+                .sector(this.sector)
                 .updated(this.updated)
                 .created(this.created)
                 .build();
+    }
+
+    public StockCik updateEnrichedData(EnrichedData enrichedData) {
+        setSic(enrichedData.getSic());
+        setSector(enrichedData.getSector());
+        return this;
+    }
+
+    @Data
+    @Builder
+    public static class EnrichedData {
+        private String sic;
+        private String sector;
     }
 
 }

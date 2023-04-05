@@ -12,8 +12,11 @@ import org.springframework.context.annotation.Configuration;
 public class EdgarConfig {
     private String companyTickersUrl;
     private String companyTickersExchangeUrl;
+    private String enrichSectorUrl;
 
     private Boolean useTickers;
 
     private Boolean useTickersExchange;
+
+    private Boolean useEnrichSector;
 }

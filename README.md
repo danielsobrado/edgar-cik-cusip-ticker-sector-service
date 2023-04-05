@@ -38,7 +38,7 @@ All the configuration settings can be found in the `src/main/resources/applicati
 * `edgar.unenriched-cron`: Cron expression for scheduling the enrichment of unenriched CIKs.
   * Default value: `0 0 0 * * *`
 * `edgar.sector-enrich-cron`: Cron expression for scheduling the enrichment of sector data.
-  * Default value: `0 0/10 * * * *`
+  * Default value: `*/10 * * * * *`
 * `edgar.use-tickers`: Enable or disable the company tickers downloader.
   * Default value: `false`
 * `edgar.use-tickers-exchange`: Enable or disable the company tickers with exchange downloader.
