@@ -51,6 +51,14 @@ public class EdgarSectorEnrichService {
 
         Document doc = Jsoup.connect(url).get();
 
+        // Check if "No matching Ticker Symbol." is present in the HTML content
+        if (doc.text().contains("No matching Ticker Symbol.")) {
+            return StockCik.EnrichedData.builder()
+                    .sic("Not Found")
+                    .sector("Not Found")
+                    .build();
+        }
+
         String sic = doc.select("p.identInfo a").first().ownText().strip();
         String sector = doc.select("p.identInfo").first().ownText();
 
