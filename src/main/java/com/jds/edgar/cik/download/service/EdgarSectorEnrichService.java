@@ -13,6 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -76,6 +78,20 @@ public class EdgarSectorEnrichService {
                 .sic(sic)
                 .sector(sector)
                 .build();
+    }
+
+    public void exportToCSV(PrintWriter writer) {
+        List<StockCik> stockCiks = cikRepository.findAll();
+
+        writer.println("CIK,Ticker,Name,Sector,SIC");
+
+        stockCiks.stream().map(stockCik -> String.format("%s,%s,%s,%s,%s",
+                        stockCik.getCik(),
+                        stockCik.getTicker(),
+                        stockCik.getTitle(),
+                        stockCik.getSector(),
+                        stockCik.getSic()))
+                .forEach(writer::println);
     }
 
 }

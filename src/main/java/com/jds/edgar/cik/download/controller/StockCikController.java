@@ -3,12 +3,15 @@ package com.jds.edgar.cik.download.controller;
 import com.jds.edgar.cik.download.model.StockCik;
 import com.jds.edgar.cik.download.repository.CikRepository;
 import com.jds.edgar.cik.download.service.EdgarSectorEnrichService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,5 +63,15 @@ public class StockCikController {
         Optional<StockCik> stockCikOptional = edgarSectorEnrichService.enrichCik(ticker);
         return stockCikOptional.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/export/csv")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=stocks.csv");
+
+        try (PrintWriter writer = response.getWriter()) {
+            edgarSectorEnrichService.exportToCSV(writer);
+        }
     }
 }

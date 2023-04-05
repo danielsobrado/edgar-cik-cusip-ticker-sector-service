@@ -111,6 +111,8 @@ The service will start and automatically download and update CIK data based on t
 * GET `/api/stocks/ticker/{ticker}`: Retrieves the stock information by ticker. 
 * GET `/api/stocks/sector/{sector}`: Retrieves a list of stock information by sector. 
 * GET `/api/stocks/sic/{sic}`: Retrieves a list of stock information by SIC code (tag).
+* POST `/api/stocks/enrich/ticker/{ticker}`: Enriches the stock information by ticker.
+* GET `/api/stocks/export/csv`: Exports the CIK data to a CSV file.
   All endpoints return a JSON object or a list of JSON objects with the stock information if found or a 404 status code if the CIK, ticker, sector, or SIC code is not found.
 
 Example of end point use:
