@@ -1,9 +1,8 @@
 graph LR
 A[Client] -->|Request| B1[REST API]
 B1 --> C1[StockCikController]
-C1 --> D1[CikRepository]
+C1 --> D1[StockCikRepository]
 D1 --> E1[Database]
-E1 --> D1
 D1 --> C1
 C1 --> B1
 B1 -->|Response| A
@@ -14,8 +13,9 @@ G --> D1
 G --> H1[ProcessExecutionRepository]
 H1 --> E1
 
-C1 --> J[EdgarSectorEnrichService]
-J --> D1
+C1 --> K[FilingsDownloadService]
+C1 --> J
+K --> D1
 
 classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
 classDef api fill:#9fdaff,stroke:#333,stroke-width:1px;
@@ -32,4 +32,5 @@ class E1 database;
 class F scheduled;
 class G service;
 class H1 repository;
-class J service
+class J service;
+class K service;
