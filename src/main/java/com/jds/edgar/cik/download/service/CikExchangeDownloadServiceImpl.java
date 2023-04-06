@@ -3,6 +3,7 @@ package com.jds.edgar.cik.download.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jds.edgar.cik.download.config.EdgarConfig;
 import com.jds.edgar.cik.download.model.Stock;
+import com.jds.edgar.cik.download.model.StockId;
 import com.jds.edgar.cik.download.repository.StockRepository;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
@@ -50,17 +51,19 @@ public class CikExchangeDownloadServiceImpl extends AbstractDownloadService {
         List<List<Object>> stockData = (List<List<Object>>) data.get("data");
         stockData.forEach(stockValues -> {
             Long cik = Long.valueOf(String.valueOf(stockValues.get(0)));
-            Optional<Stock> optionalStockCik = stockCikRepository.findByCik(cik);
+            String ticker = (String) stockValues.get(2);
+            StockId stockId = new StockId(cik, ticker);
+            Optional<Stock> optionalStockCik = stockCikRepository.findById(stockId);
 
             Stock stockCik = optionalStockCik.orElseGet(() -> {
                 Stock newStockCik = Stock.builder()
                         .cik(cik)
-                        .ticker((String) stockValues.get(2))
+                        .ticker(ticker)
                         .name((String) stockValues.get(1))
                         .exchange((String) stockValues.get(3))
                         .build();
                 stockCikRepository.save(newStockCik);
-                log.info("New StockCik object saved: {}", newStockCik);
+                log.info("New Stock object saved: {}", newStockCik);
                 return newStockCik;
             });
 
@@ -73,11 +76,6 @@ public class CikExchangeDownloadServiceImpl extends AbstractDownloadService {
                 updated = true;
             }
 
-            if (!stockCik.getTicker().equals(stockValues.get(2))) {
-                stockCik.setTicker((String) stockValues.get(2));
-                updated = true;
-            }
-
             if (!stockCik.getName().equals(stockValues.get(1))) {
                 stockCik.setName((String) stockValues.get(1));
                 updated = true;
@@ -86,9 +84,9 @@ public class CikExchangeDownloadServiceImpl extends AbstractDownloadService {
             if (updated) {
                 stockCik.setUpdated(LocalDateTime.now());
                 stockCikRepository.save(stockCik);
-                log.warn("CIK {} has been updated", cik);
-                log.info("StockCik object before update: {}", originalStockCik);
-                log.info("StockCik object after update: {}", stockCik);
+                log.warn("Stock ID {} has been updated", stockId);
+                log.info("Stock object before update: {}", originalStockCik);
+                log.info("Stock object after update: {}", stockCik);
             }
         });
         updateLastExecutionTime(PROCESS_NAME);
