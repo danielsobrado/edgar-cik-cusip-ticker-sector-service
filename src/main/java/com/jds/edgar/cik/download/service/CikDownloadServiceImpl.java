@@ -2,8 +2,8 @@ package com.jds.edgar.cik.download.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jds.edgar.cik.download.config.EdgarConfig;
-import com.jds.edgar.cik.download.model.StockCik;
-import com.jds.edgar.cik.download.repository.CikRepository;
+import com.jds.edgar.cik.download.model.Stock;
+import com.jds.edgar.cik.download.repository.StockRepository;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class CikDownloadServiceImpl extends AbstractDownloadService {
     private static final String PROCESS_NAME = "CIK_DATA_UPDATE";
 
     private final EdgarConfig edgarConfig;
-    private final CikRepository cikRepository;
+    private final StockRepository stockCikRepository;
 
     @Scheduled(cron = "${edgar.cik-update-cron}")
     @Override
@@ -48,11 +48,11 @@ public class CikDownloadServiceImpl extends AbstractDownloadService {
     private void updateDatabase(Map<String, Map<String, Object>> data) {
         data.forEach((key, value) -> {
             Long cik = Long.valueOf(String.valueOf(value.get("cik_str")));
-            Optional<StockCik> stockCikOptional = cikRepository.findById(cik);
+            Optional<Stock> stockCikOptional = stockCikRepository.findByCik(cik);
 
             if (stockCikOptional.isPresent()) {
-                StockCik stockCik = stockCikOptional.get();
-                StockCik originalStockCik = stockCik.copy();
+                Stock stockCik = stockCikOptional.get();
+                Stock originalStockCik = stockCik.copy();
                 boolean updated = false;
 
                 if (!stockCik.getTicker().equals(value.get("ticker"))) {
@@ -60,26 +60,26 @@ public class CikDownloadServiceImpl extends AbstractDownloadService {
                     updated = true;
                 }
 
-                if (!stockCik.getTitle().equals(value.get("title"))) {
-                    stockCik.setTitle((String) value.get("title"));
+                if (!stockCik.getName().equals(value.get("title"))) {
+                    stockCik.setName((String) value.get("title"));
                     updated = true;
                 }
 
                 if (updated) {
                     stockCik.setUpdated(LocalDateTime.now());
-                    cikRepository.save(stockCik);
+                    stockCikRepository.save(stockCik);
                     log.warn("CIK {} has been updated", cik);
-                    log.info("StockCik object before update: {}", originalStockCik);
-                    log.info("StockCik object after update: {}", stockCik);
+                    log.info("Stock object before update: {}", originalStockCik);
+                    log.info("Stock object after update: {}", stockCik);
                 }
             } else {
-                StockCik newStockCik = StockCik.builder()
+                Stock newStockCik = Stock.builder()
                         .cik(cik)
                         .ticker((String) value.get("ticker"))
-                        .title((String) value.get("title"))
+                        .name((String) value.get("title"))
                         .build();
-                cikRepository.save(newStockCik);
-                log.info("New StockCik object saved: {}", newStockCik);
+                stockCikRepository.save(newStockCik);
+                log.info("New Stock object saved: {}", newStockCik);
             }
         });
         updateLastExecutionTime(PROCESS_NAME);

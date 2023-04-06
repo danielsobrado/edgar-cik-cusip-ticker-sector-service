@@ -1,8 +1,8 @@
 package com.jds.edgar.cik.download.service;
 
 import com.jds.edgar.cik.download.config.EdgarConfig;
-import com.jds.edgar.cik.download.model.StockCik;
-import com.jds.edgar.cik.download.repository.CikRepository;
+import com.jds.edgar.cik.download.model.Stock;
+import com.jds.edgar.cik.download.repository.StockRepository;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +23,10 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "edgar.use-sector-enrich", havingValue = "true")
-public class EdgarSectorEnrichService {
+public class EdgarSectorEnrichServiceImpl {
 
     private final EdgarConfig edgarConfig;
-    private final CikRepository cikRepository;
+    private final StockRepository cikRepository;
 
     @Scheduled(cron = "${edgar.sector-enrich-cron}")
     public void enrichNextCik() {
@@ -34,7 +34,7 @@ public class EdgarSectorEnrichService {
                 .ifPresent(stockCik -> enrichCik(stockCik.getTicker()));
     }
 
-    public Optional<StockCik> enrichCik(String ticker) {
+    public Optional<Stock> enrichCik(String ticker) {
 
         return cikRepository.findByTicker(ticker)
                 .flatMap(stockCik -> Try.of(() -> extractData(stockCik.getTicker()))
@@ -43,13 +43,13 @@ public class EdgarSectorEnrichService {
                         .fold(
                                 throwable -> {
                                     log.error("Error enriching CIK: {]", throwable.getMessage());
-                                    return Optional.<StockCik>empty();
+                                    return Optional.<Stock>empty();
                                 },
                                 enrichedCik -> Optional.of(cikRepository.save(enrichedCik))
                         ));
     }
 
-    private StockCik.EnrichedData extractData(String ticker) throws IOException {
+    private Stock.EnrichedData extractData(String ticker) throws IOException {
         String url = edgarConfig.getEnrichSectorUrl().replace("{cik}", String.valueOf(ticker));
         log.info("Enriching CIK: {} from: {}", ticker, url);
 
@@ -57,7 +57,7 @@ public class EdgarSectorEnrichService {
 
         // Check if "No matching Ticker Symbol." is present in the HTML content
         if (doc.text().contains("No matching Ticker Symbol.")) {
-            return StockCik.EnrichedData.builder()
+            return Stock.EnrichedData.builder()
                     .sic("Not Found")
                     .sector("Not Found")
                     .build();
@@ -80,21 +80,21 @@ public class EdgarSectorEnrichService {
             sector = sector.substring(0, maxSectorLength);
         }
 
-        return StockCik.EnrichedData.builder()
+        return Stock.EnrichedData.builder()
                 .sic(sic)
                 .sector(sector)
                 .build();
     }
 
     public void exportToCSV(PrintWriter writer) {
-        List<StockCik> stockCiks = cikRepository.findAll();
+        List<Stock> stockCiks = cikRepository.findAll();
 
         writer.println("CIK,Ticker,Name,Sector,SIC");
 
         stockCiks.stream().map(stockCik -> String.format("%s,%s,%s,%s,%s",
                         stockCik.getCik(),
                         stockCik.getTicker(),
-                        stockCik.getTitle(),
+                        stockCik.getName(),
                         stockCik.getSector(),
                         stockCik.getSic()))
                 .forEach(writer::println);

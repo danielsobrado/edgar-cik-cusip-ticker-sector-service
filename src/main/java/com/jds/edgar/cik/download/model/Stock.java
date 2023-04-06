@@ -13,22 +13,28 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "stock_cik")
+@Table(name = "stocks")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StockCik {
+@IdClass(StockId.class) // Add this line
+public class Stock {
 
     @Id
     private Long cik;
 
+    @Id
     @Nonnull
     private String ticker;
 
-    private String title;
+    private String name;
 
     private String sic;
+
+    private String cusip6;
+
+    private String cusip8;
 
     private String sector;
 
@@ -42,20 +48,22 @@ public class StockCik {
     @UpdateTimestamp
     private LocalDateTime updated;
 
-    public StockCik copy() {
-        return StockCik.builder()
+    public Stock copy() {
+        return Stock.builder()
                 .cik(this.cik)
                 .ticker(this.ticker)
                 .exchange(this.exchange)
-                .title(this.title)
+                .name(this.name)
                 .sic(this.sic)
+                .cusip6(this.cusip6)
+                .cusip8(this.cusip8)
                 .sector(this.sector)
                 .updated(this.updated)
                 .created(this.created)
                 .build();
     }
 
-    public StockCik updateEnrichedData(EnrichedData enrichedData) {
+    public Stock updateEnrichedData(EnrichedData enrichedData) {
         setSic(enrichedData.getSic());
         setSector(enrichedData.getSector());
         return this;

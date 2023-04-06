@@ -2,8 +2,8 @@ package com.jds.edgar.cik.download.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jds.edgar.cik.download.config.EdgarConfig;
-import com.jds.edgar.cik.download.model.StockCik;
-import com.jds.edgar.cik.download.repository.CikRepository;
+import com.jds.edgar.cik.download.model.Stock;
+import com.jds.edgar.cik.download.repository.StockRepository;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.Optional;
 public class CikExchangeDownloadServiceImpl extends AbstractDownloadService {
 
     private final EdgarConfig edgarConfig;
-    private final CikRepository cikRepository;
+    private final StockRepository stockCikRepository;
 
     private static final String PROCESS_NAME = "CIK_DATA_UPDATE";
 
@@ -50,21 +50,21 @@ public class CikExchangeDownloadServiceImpl extends AbstractDownloadService {
         List<List<Object>> stockData = (List<List<Object>>) data.get("data");
         stockData.forEach(stockValues -> {
             Long cik = Long.valueOf(String.valueOf(stockValues.get(0)));
-            Optional<StockCik> optionalStockCik = cikRepository.findById(cik);
+            Optional<Stock> optionalStockCik = stockCikRepository.findByCik(cik);
 
-            StockCik stockCik = optionalStockCik.orElseGet(() -> {
-                StockCik newStockCik = StockCik.builder()
+            Stock stockCik = optionalStockCik.orElseGet(() -> {
+                Stock newStockCik = Stock.builder()
                         .cik(cik)
                         .ticker((String) stockValues.get(2))
-                        .title((String) stockValues.get(1))
+                        .name((String) stockValues.get(1))
                         .exchange((String) stockValues.get(3))
                         .build();
-                cikRepository.save(newStockCik);
+                stockCikRepository.save(newStockCik);
                 log.info("New StockCik object saved: {}", newStockCik);
                 return newStockCik;
             });
 
-            StockCik originalStockCik = stockCik.copy();
+            Stock originalStockCik = stockCik.copy();
             boolean updated = false;
 
             String newExchange = (String) stockValues.get(3);
@@ -78,14 +78,14 @@ public class CikExchangeDownloadServiceImpl extends AbstractDownloadService {
                 updated = true;
             }
 
-            if (!stockCik.getTitle().equals(stockValues.get(1))) {
-                stockCik.setTitle((String) stockValues.get(1));
+            if (!stockCik.getName().equals(stockValues.get(1))) {
+                stockCik.setName((String) stockValues.get(1));
                 updated = true;
             }
 
             if (updated) {
                 stockCik.setUpdated(LocalDateTime.now());
-                cikRepository.save(stockCik);
+                stockCikRepository.save(stockCik);
                 log.warn("CIK {} has been updated", cik);
                 log.info("StockCik object before update: {}", originalStockCik);
                 log.info("StockCik object after update: {}", stockCik);

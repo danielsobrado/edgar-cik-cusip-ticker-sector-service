@@ -14,6 +14,8 @@ public class EdgarConfig {
     private String companyTickersExchangeUrl;
     private String enrichSectorUrl;
 
+    private String fullIndexUrl;
+
     private Boolean useTickers;
 
     private Boolean useTickersExchange;

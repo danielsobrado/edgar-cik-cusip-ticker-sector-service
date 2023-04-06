@@ -2,8 +2,8 @@ package com.jds.edgar.cik.download.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jds.edgar.cik.download.config.EdgarConfig;
-import com.jds.edgar.cik.download.model.StockCik;
-import com.jds.edgar.cik.download.repository.CikRepository;
+import com.jds.edgar.cik.download.model.Stock;
+import com.jds.edgar.cik.download.repository.StockRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,7 @@ public class CikExchangeDownloadServiceTest {
     private EdgarConfig edgarConfig;
 
     @Mock
-    private CikRepository cikRepository;
+    private StockRepository cikRepository;
 
     @InjectMocks
     private CikExchangeDownloadServiceImpl cikExchangeDownloadService;
@@ -53,11 +53,11 @@ public class CikExchangeDownloadServiceTest {
     @Test
     public void testUpdateCikExchangeData() {
         when(edgarConfig.getCompanyTickersExchangeUrl()).thenReturn("classpath:company_tickers_exchange_test.json");
-        when(cikRepository.findById(any())).thenReturn(Optional.of(mock(StockCik.class)));
+        when(cikRepository.findById(any())).thenReturn(Optional.of(mock(Stock.class)));
 
         cikExchangeDownloadService.downloadCikData();
 
-        verify(cikRepository, atLeastOnce()).save(any(StockCik.class));
+        verify(cikRepository, atLeastOnce()).save(any(Stock.class));
     }
 
 }
