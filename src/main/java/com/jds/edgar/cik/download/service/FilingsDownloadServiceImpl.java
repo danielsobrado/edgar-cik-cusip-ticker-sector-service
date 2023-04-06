@@ -57,8 +57,14 @@ public class FilingsDownloadServiceImpl {
                 .boxed()
                 .flatMap(year -> IntStream.range(year == startYear ? startQuarter : 1, 5).mapToObj(q -> Pair.of(year, q)))
                 .map(pair -> String.format("%s/%d/QTR%d/master.idx", edgarConfig.getFullIndexUrl(), pair.getLeft(), pair.getRight()))
-                .map(url -> Try.of(() -> restTemplate.getForObject(url, String.class)).getOrElseThrow(e -> new RuntimeException("Failed to download master.idx", e)))
-                .forEach(this::parseMasterIdxContent);
+                .forEach(url -> {
+                    Try<String> response = Try.of(() -> restTemplate.getForObject(url, String.class));
+                    if (response.isSuccess()) {
+                        parseMasterIdxContent(response.get());
+                    } else {
+                        response.onFailure(e -> log.error("Failed to download master.idx from URL: {}", url, e));
+                    }
+                });
     }
 
     public void parseMasterIdxContent(String masterIdxContent) {

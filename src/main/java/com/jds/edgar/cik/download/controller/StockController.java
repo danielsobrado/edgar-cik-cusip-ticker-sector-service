@@ -4,6 +4,7 @@ import com.jds.edgar.cik.download.model.Stock;
 import com.jds.edgar.cik.download.repository.StockRepository;
 import com.jds.edgar.cik.download.service.EdgarSectorEnrichServiceImpl;
 import com.jds.edgar.cik.download.service.FilingsDownloadServiceImpl;
+import com.jds.edgar.cik.download.service.StockEnrichmentServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,9 @@ public class StockController {
 
     @NonNull
     private FilingsDownloadServiceImpl fullIndexDownloadService;
+
+    @NonNull
+    private StockEnrichmentServiceImpl stockEnrichmentService;
 
     @GetMapping("/cik/{cik}")
     public ResponseEntity<Stock> getByCik(@PathVariable Long cik) {
@@ -79,6 +83,15 @@ public class StockController {
             edgarSectorEnrichService.exportToCSV(writer);
         }
     }
+    @GetMapping("/enrich/cusip")
+    public ResponseEntity<Void> enrichStocksWithCusip() {
+        try {
+            stockEnrichmentService.enrichStockWithCusips();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @GetMapping("/enrich/cusip/from-filings")
     public ResponseEntity<Void> generateMappingFile(@RequestParam(value = "filingTypes") String filingTypes) {
@@ -91,3 +104,4 @@ public class StockController {
         }
     }
 }
+
