@@ -1,6 +1,7 @@
 package com.jds.edgar.cik.download.controller;
 
 import com.jds.edgar.cik.download.model.Stock;
+import com.jds.edgar.cik.download.repository.FullIndexRepository;
 import com.jds.edgar.cik.download.repository.StockRepository;
 import com.jds.edgar.cik.download.service.EdgarSectorEnrichServiceImpl;
 import com.jds.edgar.cik.download.service.FilingsDownloadServiceImpl;
@@ -17,6 +18,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +36,12 @@ public class StockController {
 
     @NonNull
     private StockEnrichmentServiceImpl stockEnrichmentService;
+
+    @NonNull
+    private FullIndexRepository fullIndexRepository;
+
+    @NonNull
+    private FilingsDownloadServiceImpl filingsDownloadServiceImpl;
 
     @GetMapping("/cik/{cik}")
     public ResponseEntity<Stock> getByCik(@PathVariable Long cik) {
@@ -102,6 +110,18 @@ public class StockController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/download/{filingType}")
+    public ResponseEntity<String> downloadFilingsOfType(@PathVariable String filingType) {
+        String result = filingsDownloadServiceImpl.downloadFilingsOfType(filingType);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/formTypes")
+    public ResponseEntity<Set<String>> getDistinctFormTypes() {
+        Set<String> formTypes = fullIndexRepository.findDistinctFormTypes();
+        return new ResponseEntity<>(formTypes, HttpStatus.OK);
     }
 }
 

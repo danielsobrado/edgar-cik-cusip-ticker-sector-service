@@ -16,6 +16,10 @@ public class EdgarConfig {
 
     private String fullIndexUrl;
 
+    private String filingsFolder;
+
+    private String baseUrl;
+
     private Boolean useTickers;
 
     private Boolean useTickersExchange;

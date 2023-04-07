@@ -8,12 +8,15 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface FullIndexRepository extends JpaRepository<FullIndex, Long> {
     @Query("SELECT MAX(fi.dateFiled) FROM FullIndex fi")
     Optional<LocalDate> findLatestDateFiled();
 
-    @Query("SELECT fi FROM FullIndex fi WHERE fi.formType = :formType")
-    List<FullIndex> findAllByFormType(String formType);
+    @Query("SELECT DISTINCT f.formType FROM FullIndex f")
+    Set<String> findDistinctFormTypes();
+
+    List<FullIndex> findByFormType(String filingType);
 }

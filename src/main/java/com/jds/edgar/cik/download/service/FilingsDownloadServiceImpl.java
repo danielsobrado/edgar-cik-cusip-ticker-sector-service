@@ -45,8 +45,8 @@ public class FilingsDownloadServiceImpl {
 
         for (String filingType : filingTypes) {
             String targetFolder = filingType;
-            List<FullIndex> targetFilings = fullIndexRepository.findAllByFormType(filingType);
-            downloadFilingsOfType(filingType, targetFolder, targetFilings);
+            List<FullIndex> targetFilings = fullIndexRepository.findByFormType(filingType);
+            downloadFilingsOfType(filingType);
         }
 
         List<String> csvFiles = filingTypes.stream().map(filingType -> filingType + ".csv").collect(Collectors.toList());
@@ -152,8 +152,12 @@ public class FilingsDownloadServiceImpl {
     }
 
 
-    public void downloadFilingsOfType(String filingType, String targetFolder, List<FullIndex> targetFilings) {
+    public String downloadFilingsOfType(String filingType) {
         log.info("Start downloading {} filings", filingType);
+
+        List<FullIndex> targetFilings = fullIndexRepository.findByFormType(filingType);
+        int newFilings = 0;
+        int existingFilings = 0;
 
         for (int i = 0; i < targetFilings.size(); i++) {
             FullIndex row = targetFilings.get(i);
@@ -164,30 +168,51 @@ public class FilingsDownloadServiceImpl {
             String year = date.split("-")[0].trim();
             String month = date.split("-")[1].trim();
             String url = row.getFilename().trim();
-            String accession = url.split("\\.")[0].split("-")[-1];
+            String accession = url.split("\\.")[0].split("-")[url.split("\\.")[0].split("-").length - 1];
 
-            Path folderPath = Paths.get(targetFolder, year + "_" + month);
+            Path folderPath = Paths.get(edgarConfig.getFilingsFolder(), filingType, year + "_" + month);
             folderPath.toFile().mkdirs();
 
-            String filePath = String.format("./%s/%s_%s/%s_%s_%s.txt", targetFolder, year, month, cik, date, accession);
+            String filePath = String.format("%s/%s/%s_%s/%s_%s_%s.txt", edgarConfig.getFilingsFolder(), filingType, year, month, cik, date, accession);
             File file = new File(filePath);
             if (file.exists()) {
+                existingFilings++;
                 continue;
             }
 
-            Try<String> contentTry = Try.of(() -> restTemplate.getForObject("https://www.sec.gov/Archives/" + url, String.class));
-            if (contentTry.isSuccess()) {
-                try (FileWriter fileWriter = new FileWriter(file)) {
-                    fileWriter.write(contentTry.get());
-                } catch (Exception e) {
-                    log.error("{}: {} failed to download", cik, date, e);
+            ResponseEntity<byte[]> response = restTemplate.getForEntity(edgarConfig.getBaseUrl() + url, byte[].class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                try {
+                    String contentEncoding = response.getHeaders().getFirst("Content-Encoding");
+                    byte[] responseBody = response.getBody();
+                    String content;
+
+                    if (contentEncoding != null && contentEncoding.equalsIgnoreCase("gzip")) {
+                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(responseBody);
+                        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+                        content = IOUtils.toString(gzipInputStream, StandardCharsets.UTF_8);
+                    } else {
+                        content = new String(responseBody, StandardCharsets.UTF_8);
+                    }
+
+                    try (FileWriter fileWriter = new FileWriter(file)) {
+                        fileWriter.write(content);
+                        newFilings++;
+                    } catch (Exception e) {
+                        log.error("{}: {} failed to download", cik, date, e);
+                    }
+                } catch (IOException e) {
+                    log.error("Error decompressing content: {}", e.getMessage(), e);
                 }
             } else {
                 log.error("{}: {} failed to download", cik, date);
             }
-            log.info("Finished downloading {} filings", filingType);
         }
+        log.info("Finished downloading {} filings", filingType);
+        log.info("New filings: {}, Existing filings: {}", newFilings, existingFilings);
+        return "Downloaded " + newFilings + " new filings and found " + existingFilings + " existing filings for " + filingType + ".";
     }
+
 
 
     public void generateMappings(List<String> csvFiles) {
