@@ -41,7 +41,7 @@ public class StockController {
     private FullIndexRepository fullIndexRepository;
 
     @NonNull
-    private FilingsDownloadServiceImpl filingsDownloadServiceImpl;
+    private FilingsDownloadServiceImpl filingsDownloadService;
 
     @GetMapping("/cik/{cik}")
     public ResponseEntity<Stock> getByCik(@PathVariable Long cik) {
@@ -114,7 +114,7 @@ public class StockController {
 
     @GetMapping("/download/{filingType}")
     public ResponseEntity<String> downloadFilingsOfType(@PathVariable String filingType) {
-        String result = filingsDownloadServiceImpl.downloadFilingsOfType(filingType);
+        String result = filingsDownloadService.downloadFilingsOfType(filingType);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -122,6 +122,12 @@ public class StockController {
     public ResponseEntity<Set<String>> getDistinctFormTypes() {
         Set<String> formTypes = fullIndexRepository.findDistinctFormTypes();
         return new ResponseEntity<>(formTypes, HttpStatus.OK);
+    }
+
+    @GetMapping("/downloadFullIndex")
+    public ResponseEntity<String> downloadFullIndex() {
+        filingsDownloadService.downloadFullIndex();
+        return ResponseEntity.ok("Full index download initiated.");
     }
 }
 

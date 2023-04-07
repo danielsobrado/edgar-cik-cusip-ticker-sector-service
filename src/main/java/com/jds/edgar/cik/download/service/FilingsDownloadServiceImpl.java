@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
@@ -56,7 +57,10 @@ public class FilingsDownloadServiceImpl {
     public void downloadFullIndex() {
         log.info("Start downloading full index files");
         int currentYear = Year.now().getValue();
-        LocalDate latestDate = fullIndexRepository.findLatestDateFiled().orElse(LocalDate.of(1994, 1, 1));
+
+        Optional<String> latestDateString = fullIndexRepository.findLatestDateFiled();
+        LocalDate latestDate = latestDateString.map(dateStr -> LocalDate.parse(dateStr)).orElse(LocalDate.of(1994, 1, 1));
+
         int startYear = latestDate.getYear();
         int startQuarter = (latestDate.getMonthValue() - 1) / 3 + 1;
 
