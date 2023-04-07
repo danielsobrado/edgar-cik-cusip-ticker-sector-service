@@ -7,6 +7,7 @@ import com.jds.edgar.cik.download.repository.CikCusipMapsRepository;
 import com.jds.edgar.cik.download.repository.FullIndexRepository;
 import com.jds.edgar.cik.download.repository.StockRepository;
 import io.vavr.control.Try;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -28,6 +29,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
@@ -135,7 +137,7 @@ public class FilingsDownloadServiceImpl {
         }
     }
 
-
+    @Transactional
     public void parseMasterIdxContent(String masterIdxContent) {
         log.info("Start parsing master.idx content");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -233,6 +235,37 @@ public class FilingsDownloadServiceImpl {
         return "Downloaded " + newFilings + " new filings and found " + existingFilings + " existing filings for " + filingType + ".";
     }
 
+    public String downloadFilingsOfType13() {
+        log.info("Start downloading filings containing 13 in form type");
+
+        Set<String> allFormTypes = fullIndexRepository.findDistinctFormTypes();
+        Set<String> targetFormTypes = allFormTypes.stream()
+                .filter(formType -> formType.contains("13"))
+                .collect(Collectors.toSet());
+
+        StringBuilder result = new StringBuilder();
+        int totalNewFilings = 0;
+        int totalExistingFilings = 0;
+
+        for (String formType : targetFormTypes) {
+            String downloadResult = downloadFilingsOfType(formType);
+            result.append(downloadResult).append(System.lineSeparator());
+
+            String[] parts = downloadResult.split(" ");
+            int newFilings = Integer.parseInt(parts[1]);
+            int existingFilings = Integer.parseInt(parts[5]);
+
+            totalNewFilings += newFilings;
+            totalExistingFilings += existingFilings;
+        }
+
+        log.info("Finished downloading filings containing 13 in form type");
+        result.append("Total new filings: ").append(totalNewFilings)
+                .append(", Total existing filings: ").append(totalExistingFilings)
+                .append(" for forms containing 13.");
+
+        return result.toString();
+    }
 
 
     public void generateMappings(List<String> csvFiles) {
@@ -268,7 +301,6 @@ public class FilingsDownloadServiceImpl {
         }
     }
 
-
     private Try<List<String[]>> readCsvFile(String csvFile) {
         return Try.of(() -> {
             try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
@@ -291,30 +323,6 @@ public class FilingsDownloadServiceImpl {
                 })
                 .distinct()
                 .collect(Collectors.toList());
-    }
-
-    private void writeMappingFile(String outputFilePath, List<String[]> data) {
-        try (FileWriter fileWriter = new FileWriter(outputFilePath)) {
-            fileWriter.write("cik,cusip6,cusip8\n");
-            for (String[] row : data) {
-                fileWriter.write(String.join(",", row) + "\n");
-            }
-        } catch (Exception e) {
-            log.error("Failed to write mapping file", e);
-            throw new RuntimeException("Failed to write mapping file", e);
-        }
-    }
-
-    private List<String[]> readTargetFilingsFromCsv(String fullIndexCsvPath, String filingType) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fullIndexCsvPath))) {
-            return reader.lines()
-                    .skip(1) // Skip header
-                    .map(line -> line.split(","))
-                    .filter(columns -> columns[2].contains(filingType))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to read target filings from CSV", e);
-        }
     }
 
 }

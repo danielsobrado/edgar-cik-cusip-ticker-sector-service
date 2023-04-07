@@ -121,6 +121,13 @@ public class StockController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PostMapping("/download/forms13")
+    public ResponseEntity<String> downloadFilingsOfType13(@PathVariable String filingType) {
+        String result = filingsDownloadService.downloadFilingsOfType13();
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
     @GetMapping("/formTypes")
     public ResponseEntity<Set<String>> getDistinctFormTypes() {
         Set<String> formTypes = fullIndexRepository.findDistinctFormTypes();
