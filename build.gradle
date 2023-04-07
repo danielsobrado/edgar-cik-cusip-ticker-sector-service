@@ -41,6 +41,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.14.3'
 	implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
 	implementation 'com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.8.1'
+	implementation 'commons-io:commons-io:2.11.0'
 
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 

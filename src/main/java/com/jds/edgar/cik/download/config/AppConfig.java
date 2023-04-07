@@ -20,8 +20,10 @@ public class AppConfig {
         RestTemplate restTemplate = new RestTemplate();
 
         ClientHttpRequestInterceptor userAgentInterceptor = (request, body, execution) -> {
-            request.getHeaders().set("User-Agent", userAgentName + " " + userEmail);
-            request.getHeaders().set("Accept-Encoding", "gzip, deflate");
+            request.getHeaders().set("User-Agent", "Mozilla/5.0");
+            request.getHeaders().set("Accept", "*/*");
+            request.getHeaders().set("Connection", "keep-alive");
+            request.getHeaders().set("Accept-Encoding", "gzip, deflate, br");
             return execution.execute(request, body);
         };
 

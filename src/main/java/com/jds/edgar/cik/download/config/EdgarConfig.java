@@ -21,4 +21,6 @@ public class EdgarConfig {
     private Boolean useTickersExchange;
 
     private Boolean useEnrichSector;
+
+    private Long retryDelay = 5000L;
 }
