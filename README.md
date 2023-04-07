@@ -106,22 +106,72 @@ cd edgar-cik-ticker-service
 
 The service will start and automatically download and update CIK data based on the specified cron expressions in the application.yml file.
 
-## Endpoints
-* GET `/api/stocks/cik/{cik}`: Retrieves the stock information by CIK.
-* GET `/api/stocks/ticker/{ticker}`: Retrieves the stock information by ticker.
-* GET `/api/stocks/sector/{sector}`: Retrieves a list of stock information by sector.
-* GET `/api/stocks/sic/{sic}`: Retrieves a list of stock information by SIC code (tag).
-* POST `/api/stocks/enrich/ticker/{ticker}`: Enriches the stock information by ticker.
-* GET `/api/stocks/export/csv`: Exports the CIK data to a CSV file.
-* GET `/api/stocks/enrich/cusip`: Enriches the stock information with CUSIP extracted from the Edgar filings.
-* GET `/api/stocks/enrich/cusip/from-filings`: Generates a mapping file based on the given filing types.
-* GET `/api/stocks/download/{filingType}`: Downloads filings of the given filing type.
-* GET `/api/stocks/formTypes`: Retrieves a list of distinct form types from the full index.
-* GET `/api/stocks/downloadFullIndex`: Initiates the download of the full index.
-All endpoints return a JSON object or a list of JSON objects with the stock information if found or a 404 status code if the CIK, ticker, sector, or SIC code is not found.
+## API Endpoints
+
+### Stock Information
+
+- `GET /api/v1/stocks/cik/{cik}`: Retrieves the stock information by CIK.
+- `GET /api/v1/stocks/ticker/{ticker}`: Retrieves the stock information by ticker.
+- `GET /api/v1/stocks?sector={sector}`: Retrieves a list of stock information by sector.
+- `GET /api/v1/stocks?sic={sic}`: Retrieves a list of stock information by SIC code (tag).
+
+### Enrich Stock Information
+
+- `POST /api/v1/stocks/enrich/ticker/{ticker}`: Enriches the stock information by ticker.
+- `GET /api/v1/stocks/enrich/cusip`: Enriches the stock information with CUSIP extracted from the Edgar filings.
+- `GET /api/v1/stocks/enrich/cusip/from-filings`: Generates a mapping file based on the given filing types.
+
+### Export Stock Information
+
+- `GET /api/v1/stocks/export/csv`: Exports the CIK data to a CSV file.
+
+### Filings
+
+- `GET /api/v1/stocks/filings/{filingType}`: Downloads filings of the given filing type.
+
+### Form Types
+
+- `GET /api/v1/stocks/formTypes`: Retrieves a list of distinct form types from the full index.
+
+### Full Index
+
+- `POST /api/v1/stocks/fullIndex`: Initiates the download of the full index.
+- `GET /api/v1/edgar/download_full_index?year={year}&quarter={quarter}`: Downloads and processes the full index for a specific year and quarter.
+
 Example of end point use:
 
 ![Endpoint](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/APIExample.PNG)
+
+## Download Full Index for a Specific Year and Quarter
+
+This endpoint downloads and processes the EDGAR master index file for the specified year and quarter.
+
+### Request
+
+`GET /api/v1/edgar/download_full_index`
+
+| Parameter | Type   | Description                                      |
+|-----------|--------|--------------------------------------------------|
+| year      | int    | The year of the index file to download.          |
+| quarter   | int    | The quarter of the index file to download (1-4). |
+
+### Response
+
+The endpoint returns an HTTP 204 No Content status on successful processing, or an appropriate error status with a message if there's an issue.
+
+#### Successful Response
+
+- Status: `204 No Content`
+
+#### Error Response
+
+- Status: `400 Bad Request`
+  - Description: Invalid input parameters.
+  - Example: `{"message": "Invalid year or quarter."}`
+
+- Status: `500 Internal Server Error`
+  - Description: An error occurred during processing.
+  - Example: `{"message": "Failed to download and process the master index file."}`
 
 ## Process Execution Tracking
 This application keeps track of the last execution time of the CIK data update process. The purpose of this tracking is to ensure that the process is executed immediately if the last execution date is more than one month ago, or if the tracking table is empty (e.g., the application is run for the first time).

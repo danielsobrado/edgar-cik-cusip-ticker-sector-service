@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -68,57 +69,72 @@ public class FilingsDownloadServiceImpl {
                 .boxed()
                 .flatMap(year -> IntStream.range(year == startYear ? startQuarter : 1, 5).mapToObj(q -> Pair.of(year, q)))
                 .map(pair -> String.format("%s/%d/QTR%d/master.idx", edgarConfig.getFullIndexUrl(), pair.getLeft(), pair.getRight()))
-                .forEach(url -> {
-                    int retries = 3;
-                    boolean success = false;
-                    while (!success && retries > 0) {
-                        log.info("Downloading master.idx file from URL: {}", url);
-                        try {
-                            ResponseEntity<byte[]> response = restTemplate.execute(url, HttpMethod.GET, null, responseExtractor -> {
-                                if (responseExtractor.getStatusCode() == HttpStatus.OK) {
-                                    String contentEncoding = responseExtractor.getHeaders().getFirst("Content-Encoding");
-                                    InputStream inputStream = responseExtractor.getBody();
-                                    if ("gzip".equalsIgnoreCase(contentEncoding)) {
-                                        inputStream = new GZIPInputStream(inputStream);
-                                    }
-                                    String masterIdxContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                                    return new ResponseEntity<>(masterIdxContent.getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
-                                } else {
-                                    return new ResponseEntity<>(null, responseExtractor.getStatusCode());
-                                }
-                            });
+                .forEach(url -> downloadAndProcessMasterIdx(url));
 
-                            if (response.getStatusCode() == HttpStatus.OK) {
-                                String masterIdxContent = new String(response.getBody(), StandardCharsets.UTF_8);
-                                parseMasterIdxContent(masterIdxContent);
-                                success = true;
-                            } else {
-                                log.error("Failed to download master.idx from URL: {} Retrying... Remaining retries: {}", url, retries - 1);
-                                retries--;
-                                if (retries > 0) {
-                                    try {
-                                        Thread.sleep(edgarConfig.getRetryDelay()); // 5 seconds delay
-                                    } catch (InterruptedException ie) {
-                                        log.error("Thread sleep interrupted: {}", ie.getMessage(), ie);
-                                    }
-                                }
-                            }
-                        } catch (RestClientException e) {
-                            log.error("Failed to download with error: {}", e.getMessage());
-                            log.error("Failed to download master.idx from URL: {} Retrying... Remaining retries: {}", url, retries - 1);
-                            retries--;
-                            if (retries > 0) {
-                                try {
-                                    Thread.sleep(edgarConfig.getRetryDelay()); // 5 seconds delay
-                                } catch (InterruptedException ie) {
-                                    log.error("Thread sleep interrupted: {}", ie.getMessage(), ie);
-                                }
-                            }
-                        }
-                    }
-                });
         log.info("Finished downloading full index files");
     }
+
+    public void downloadIndexForYearAndQuarter(int year, int quarter) {
+        log.info("Start downloading index file for year {} and quarter {}", year, quarter);
+        if (quarter < 1 || quarter > 4) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quarter must be between 1 and 4");
+        }
+
+        String url = String.format("%s/%d/QTR%d/master.idx", edgarConfig.getFullIndexUrl(), year, quarter);
+        downloadAndProcessMasterIdx(url);
+        log.info("Finished downloading index file for year {} and quarter {}", year, quarter);
+    }
+
+    private void downloadAndProcessMasterIdx(String url) {
+        int retries = 3;
+        boolean success = false;
+        while (!success && retries > 0) {
+            log.info("Downloading master.idx file from URL: {}", url);
+            try {
+                ResponseEntity<byte[]> response = restTemplate.execute(url, HttpMethod.GET, null, responseExtractor -> {
+                    if (responseExtractor.getStatusCode() == HttpStatus.OK) {
+                        String contentEncoding = responseExtractor.getHeaders().getFirst("Content-Encoding");
+                        InputStream inputStream = responseExtractor.getBody();
+                        if ("gzip".equalsIgnoreCase(contentEncoding)) {
+                            inputStream = new GZIPInputStream(inputStream);
+                        }
+                        String masterIdxContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                        return new ResponseEntity<>(masterIdxContent.getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>(null, responseExtractor.getStatusCode());
+                    }
+                });
+
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    String masterIdxContent = new String(response.getBody(), StandardCharsets.UTF_8);
+                    parseMasterIdxContent(masterIdxContent);
+                    success = true;
+                } else {
+                    log.error("Failed to download master.idx from URL: {} Retrying... Remaining retries: {}", url, retries - 1);
+                    retries--;
+                    if (retries > 0) {
+                        try {
+                            Thread.sleep(edgarConfig.getRetryDelay()); // 5 seconds delay
+                        } catch (InterruptedException ie) {
+                            log.error("Thread sleep interrupted: {}", ie.getMessage(), ie);
+                        }
+                    }
+                }
+            } catch (RestClientException e) {
+                log.error("Failed to download with error: {}", e.getMessage());
+                log.error("Failed to download master.idx from URL: {} Retrying... Remaining retries: {}", url, retries - 1);
+                retries--;
+                if (retries > 0) {
+                    try {
+                        Thread.sleep(edgarConfig.getRetryDelay()); // 5 seconds delay
+                    } catch (InterruptedException ie) {
+                        log.error("Thread sleep interrupted: {}", ie.getMessage(), ie);
+                    }
+                }
+            }
+        }
+    }
+
 
     public void parseMasterIdxContent(String masterIdxContent) {
         log.info("Start parsing master.idx content");

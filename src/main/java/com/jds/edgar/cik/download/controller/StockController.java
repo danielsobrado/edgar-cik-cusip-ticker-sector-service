@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,18 +58,19 @@ public class StockController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @GetMapping("/sector/{sector}")
-    public ResponseEntity<List<Stock>> getBySector(@PathVariable String sector) {
-        List<Stock> stockCiks = stockCikRepository.findBySector(sector);
-        if (stockCiks.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    @GetMapping
+    public ResponseEntity<List<Stock>> getByFilter(
+            @RequestParam(value = "sector", required = false) String sector,
+            @RequestParam(value = "sic", required = false) String sic) {
+        List<Stock> stockCiks;
+        if (sector != null) {
+            stockCiks = stockCikRepository.findBySector(sector);
+        } else if (sic != null) {
+            stockCiks = stockCikRepository.findBySic(sic);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.ok(stockCiks);
-    }
 
-    @GetMapping("/sic/{sic}")
-    public ResponseEntity<List<Stock>> getBySic(@PathVariable String sic) {
-        List<Stock> stockCiks = stockCikRepository.findBySic(sic);
         if (stockCiks.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -91,6 +93,7 @@ public class StockController {
             edgarSectorEnrichService.exportToCSV(writer);
         }
     }
+
     @GetMapping("/enrich/cusip")
     public ResponseEntity<Void> enrichStocksWithCusip() {
         try {
@@ -101,7 +104,7 @@ public class StockController {
         }
     }
 
-    @GetMapping("/enrich/cusip/from-filings")
+    @PostMapping("/enrich/cusip/from-filings")
     public ResponseEntity<Void> generateMappingFile(@RequestParam(value = "filingTypes") String filingTypes) {
         try {
             List<String> filingTypesList = Arrays.asList(filingTypes.split(","));
@@ -112,7 +115,7 @@ public class StockController {
         }
     }
 
-    @GetMapping("/download/{filingType}")
+    @PostMapping("/download/{filingType}")
     public ResponseEntity<String> downloadFilingsOfType(@PathVariable String filingType) {
         String result = filingsDownloadService.downloadFilingsOfType(filingType);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -124,10 +127,20 @@ public class StockController {
         return new ResponseEntity<>(formTypes, HttpStatus.OK);
     }
 
-    @GetMapping("/downloadFullIndex")
+    @PostMapping("/downloadFullIndex")
     public ResponseEntity<String> downloadFullIndex() {
         filingsDownloadService.downloadFullIndex();
         return ResponseEntity.ok("Full index download initiated.");
+    }
+
+    @PostMapping("/download/index/{year}/{quarter}")
+    public ResponseEntity<String> downloadIndexForYearAndQuarter(@PathVariable int year, @PathVariable int quarter) {
+        try {
+            filingsDownloadService.downloadIndexForYearAndQuarter(year, quarter);
+            return ResponseEntity.ok("Index download initiated for year " + year + " and quarter " + quarter + ".");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 }
 
