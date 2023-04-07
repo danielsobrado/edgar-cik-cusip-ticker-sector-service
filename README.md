@@ -108,14 +108,17 @@ The service will start and automatically download and update CIK data based on t
 
 ## Endpoints
 * GET `/api/stocks/cik/{cik}`: Retrieves the stock information by CIK.
-* GET `/api/stocks/ticker/{ticker}`: Retrieves the stock information by ticker. 
-* GET `/api/stocks/sector/{sector}`: Retrieves a list of stock information by sector. 
+* GET `/api/stocks/ticker/{ticker}`: Retrieves the stock information by ticker.
+* GET `/api/stocks/sector/{sector}`: Retrieves a list of stock information by sector.
 * GET `/api/stocks/sic/{sic}`: Retrieves a list of stock information by SIC code (tag).
 * POST `/api/stocks/enrich/ticker/{ticker}`: Enriches the stock information by ticker.
 * GET `/api/stocks/export/csv`: Exports the CIK data to a CSV file.
-* POST `/api/stocks/enrich/cusip/from-filings/{filingTypes}`: Enriches the stock information with CUSIP extracted from the Edgar filings types mentioned.
-  All endpoints return a JSON object or a list of JSON objects with the stock information if found or a 404 status code if the CIK, ticker, sector, or SIC code is not found.
-
+* GET `/api/stocks/enrich/cusip`: Enriches the stock information with CUSIP extracted from the Edgar filings.
+* GET `/api/stocks/enrich/cusip/from-filings`: Generates a mapping file based on the given filing types.
+* GET `/api/stocks/download/{filingType}`: Downloads filings of the given filing type.
+* GET `/api/stocks/formTypes`: Retrieves a list of distinct form types from the full index.
+* GET `/api/stocks/downloadFullIndex`: Initiates the download of the full index.
+All endpoints return a JSON object or a list of JSON objects with the stock information if found or a 404 status code if the CIK, ticker, sector, or SIC code is not found.
 Example of end point use:
 
 ![Endpoint](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/APIExample.PNG)
