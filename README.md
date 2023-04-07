@@ -78,6 +78,8 @@ And the following connection string in your `application.properties`.
 
 `jdbc:postgresql://localhost:5432/edgar`
 
+Note: The performance of batch updates is much better, MySQL has issues with identity IDs for batch and Postgres does not.
+
 After an initial execution you can see that the main table gets populated:
 
 ![MySQL](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/FromMySQLWorkbench.PNG)
