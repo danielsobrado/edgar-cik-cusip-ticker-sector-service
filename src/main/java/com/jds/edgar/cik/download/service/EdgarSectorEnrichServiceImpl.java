@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,9 @@ public class EdgarSectorEnrichServiceImpl {
 
     private Optional<Stock> attemptEnrichCik(Stock stockCik, int retries) {
         for (int attempt = 1; attempt <= retries; attempt++) {
-            log.info("Attempt {} of {} for CIK: {}", attempt, retries, stockCik.getCik());
+            if (attempt > 1) {
+                log.info("Attempt {} of {} for CIK: {}", attempt, retries, stockCik.getCik());
+            }
             try {
                 Stock.EnrichedData enrichedData = extractData(stockCik.getTicker());
                 stockCik.updateEnrichedData(enrichedData);
@@ -90,7 +93,11 @@ public class EdgarSectorEnrichServiceImpl {
                     .build();
         }
 
-        String sic = doc.select("p.identInfo a").first().ownText().strip();
+        Elements sicElements = doc.select("p.identInfo a");
+        String sic = "";
+        if (sicElements != null && !sicElements.isEmpty()) {
+            sic = sicElements.first().ownText().strip();
+        }
 
         String sectorText = doc.select("p.identInfo").first().text();
         Pattern pattern = Pattern.compile("SIC: \\d{4} - (.*?) State location:");
