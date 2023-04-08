@@ -105,7 +105,7 @@ public class StockController {
     }
 
     @PostMapping("/enrich/cusip/from-filings")
-    public ResponseEntity<Void> generateMappingFile(@RequestParam(value = "filingTypes") String filingTypes) {
+    public ResponseEntity<Void> enrichFromFilings(@RequestParam(value = "filingTypes") String filingTypes) {
         try {
             List<String> filingTypesList = Arrays.asList(filingTypes.split(","));
             fullIndexDownloadService.processFillings(filingTypesList);

@@ -22,4 +22,4 @@ public class CikCusipMaps {
     private Long cik;
     private String cusip6;
     private String cusip8;
-    }
+}

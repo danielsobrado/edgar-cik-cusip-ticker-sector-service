@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "edgar")
 public class EdgarConfig {
     private String companyTickersUrl;
+
     private String companyTickersExchangeUrl;
+
     private String enrichSectorUrl;
 
     private String fullIndexUrl;

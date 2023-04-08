@@ -45,14 +45,6 @@ public class FilingsDownloadServiceImpl {
     private final CikCusipMapsRepository cikCusipMapsRepository;
 
     public void processFillings(List<String> filingTypes) {
-        downloadFullIndex();
-
-        for (String filingType : filingTypes) {
-            String targetFolder = filingType;
-            List<FullIndex> targetFilings = fullIndexRepository.findByFormType(filingType);
-            downloadFilingsOfType(filingType);
-        }
-
         List<String> csvFiles = filingTypes.stream().map(filingType -> filingType + ".csv").collect(Collectors.toList());
         generateMappings(csvFiles);
     }
@@ -285,6 +277,7 @@ public class FilingsDownloadServiceImpl {
         log.info("Finished generating mappings");
     }
 
+    @Transactional
     private void saveFilteredDataToTable(List<String[]> filteredData) {
         for (String[] row : filteredData) {
             Long cik = Long.parseLong(row[0].trim());
