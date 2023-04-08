@@ -17,6 +17,13 @@ A cron expression is used to schedule the CIK data update process.
 * Retrieve stock information by CIK or ticker through RESTful API endpoints.
 * Monitor and log CIK data updates and process executions.
 * Utilize OpenAPI/Swagger for API documentation and testing.
+* Download filings of specific form types or the ones containing '13' in their form type, each stored in its respective folder.
+* Enrich stock information by extracting additional data such as SIC and sector.
+* Retry failed enrichment attempts up to 3 times with a 5-second interval between each attempt.
+* Flag records with errors and retry only once in the next run for these records.
+* Enrich stock information with CUSIP extracted from the Edgar filings.
+* Generate a mapping file based on the given filing types.
+
 
 ## Requirements
 * Java 17
