@@ -1,4 +1,4 @@
-# Edgar CIK Downloader
+# Edgar CIK/CUSIP downloader and enricher
 This project is a Spring Boot-based service that downloads and updates CIK (Central Index Key) data from the SEC (U.S. Securities and Exchange Commission) for public companies. 
 
 The service stores the CIK data in a RDBMS (e.g. MySQL) database and supports enrichment with stock exchange information.
