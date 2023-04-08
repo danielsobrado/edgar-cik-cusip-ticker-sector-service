@@ -251,6 +251,12 @@ See:
 
 Disclaimer: I used chatGPT extensively for this project.
 
+## Final notes
+
+As the form isn't submitted until 45 days following the end of the quarter, a lot might change regarding investments during that time. It's also possible that by this point, the projected price changes have already taken place.
+
+Even with holdings information, it might be challenging to determine an asset manager's net position. A fund may be net long, net short, or more likely have a limited pay-off if it discloses holding long positions in the shares, put options, and call options. Moreover, there may be unlisted positions that call for longs in the underlying security while the manager retains a net short exposure or an investor may be partially hedged, such as short positions in convertible bonds.
+
 Please feel free to contact me if you have any questions or suggestions.
 
 ![Daniel Sobrado](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/Signed.PNG)
