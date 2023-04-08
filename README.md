@@ -5,6 +5,31 @@ The service stores the CIK data in a RDBMS (e.g. MySQL) database and supports en
 
 There are endpoints to retrieve the CIK data by CIK or ticker.
 
+### CIK (Central Index Key)
+
+CIK is a unique identifier assigned by the U.S. Securities and Exchange Commission (SEC) to companies and individuals who are required to file disclosures with the SEC. It is used to track and access filings and forms submitted by these entities.
+
+#### Usage in SEC Filings
+
+The CIK is used in the following ways:
+
+1. To uniquely identify companies and individuals required to submit filings to the SEC.
+2. To search for and access filings and forms submitted by these entities in the SEC's EDGAR (Electronic Data Gathering, Analysis, and Retrieval) database.
+
+### CUSIP (Committee on Uniform Securities Identification Procedures)
+
+CUSIP is a unique identifier for financial instruments, such as stocks and bonds, issued in the United States and Canada. The CUSIP system is owned by the American Bankers Association (ABA) and is operated by S&P Global Market Intelligence.
+
+A CUSIP consists of a nine-character alphanumeric code, where the first six characters represent the issuer, the next two characters indicate the issue, and the last character is a check digit.
+
+#### Usage in SEC Filings
+
+CUSIP is used in the following ways:
+
+1. To uniquely identify financial instruments, such as stocks and bonds, in the context of trading, clearance, and settlement.
+2. To facilitate the processing and communication of financial transactions, ensuring accurate tracking and reporting.
+
+
 A cron expression is used to schedule the CIK data update process.
 
 ![Diagram](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/ca007c90c25fa370765b3b4b624296a6fb534a87/doc/images/Diagram.PNG)
