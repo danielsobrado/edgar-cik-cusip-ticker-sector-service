@@ -3,7 +3,6 @@ package com.jds.edgar.cik.download.service;
 import com.jds.edgar.cik.download.config.EdgarConfig;
 import com.jds.edgar.cik.download.model.Stock;
 import com.jds.edgar.cik.download.repository.StockRepository;
-import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,18 +35,35 @@ public class EdgarSectorEnrichServiceImpl {
     }
 
     public Optional<Stock> enrichCik(String ticker) {
-
         return cikRepository.findByTicker(ticker)
-                .flatMap(stockCik -> Try.of(() -> extractData(stockCik.getTicker()))
-                        .toEither()
-                        .map(stockCik::updateEnrichedData)
-                        .fold(
-                                throwable -> {
-                                    log.error("Error enriching CIK: {]", throwable.getMessage());
-                                    return Optional.<Stock>empty();
-                                },
-                                enrichedCik -> Optional.of(cikRepository.save(enrichedCik))
-                        ));
+                .flatMap(stockCik -> {
+                    int retries = stockCik.getLastError() != null ? 1 : 3;
+                    return attemptEnrichCik(stockCik, retries);
+                });
+    }
+
+    private Optional<Stock> attemptEnrichCik(Stock stockCik, int retries) {
+        for (int attempt = 1; attempt <= retries; attempt++) {
+            log.info("Attempt {} of {} for CIK: {}", attempt, retries, stockCik.getCik());
+            try {
+                Stock.EnrichedData enrichedData = extractData(stockCik.getTicker());
+                stockCik.updateEnrichedData(enrichedData);
+                stockCik.setLastError(null);
+                return Optional.of(cikRepository.save(stockCik));
+            } catch (IOException e) {
+                log.error("Error enriching CIK: {} (attempt {}/{})", stockCik.getCik(), attempt, retries, e);
+                stockCik.setLastError(e.getMessage());
+                if (attempt < retries) {
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+        cikRepository.save(stockCik);
+        return Optional.empty();
     }
 
     private Stock.EnrichedData extractData(String ticker) throws IOException {

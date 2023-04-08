@@ -40,6 +40,8 @@ public class Stock {
 
     private String exchange;
 
+    private String lastError;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime created;

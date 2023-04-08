@@ -187,6 +187,29 @@ The number of unenriched records in the system will be counted by another schedu
 
 ![Diagram 2](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/22dffc0865942e39cce197e3ce53a1981631710f/doc/images/Diagram2.PNG)
 
+### Error Cases for Enriching CIK
+
+The `enrichCik` method handles various scenarios when enriching a CIK. The following are the possible error cases and how they are managed:
+
+1. **No matching Ticker Symbol**: When the provided ticker does not match any CIK, the method will return an `EnrichedData` object with the following values:
+
+  - `sic`: "Not Found"
+  - `sector`: "Not Found"
+
+2. **No matching CIK**: When the provided CIK does not have a matching record, the method will return an `EnrichedData` object with the following values:
+
+  - `sic`: "No CIK"
+  - `sector`: "No CIK"
+
+3. **Sector not available**: When the sector cannot be extracted from the page, the method will return an `EnrichedData` object with the following values:
+
+  - `sic`: (extracted SIC value)
+  - `sector`: "Not Available"
+
+4. **Error during enrichment**: When an error occurs during the enrichment process, such as an IOException, the method will retry the operation up to three times (with a 5-second interval between attempts). If the enrichment still fails after the retries, it will mark the record with an error message and save it to the repository. For records flagged with errors, the method will only retry once in the next run.
+
+  - Add a `lastError` field to the `Stock` class to store the error message from the last failed attempt. Update the `Stock` class with the necessary getter and setter methods for this field.
+
 ## Notes
 * The CIK data is updated every month, so the cron expression for the CIK data update process should be set to run once a month.
 * There are some cases where the CIK is duplicated in the CIK data file. In these cases, the service will use the first CIK found for the ticker. 
