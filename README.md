@@ -228,7 +228,7 @@ The number of unenriched records in the system will be counted by another schedu
 
 There are other fields that can be enriched from the filings:
 
-![Enrich from filings](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/22dffc0865942e39cce197e3ce53a1981631710f/doc/images/Diagram2.PNG)
+![Enrich from filings](https://github.com/danielsobrado/edgar-cik-cusip-ticker-sector-service/blob/61c58da7789820f71ebe5fa0dc0a09525bea9fb5/doc/images/Filing13GExample.png)
 
 ### Error Cases for Enriching CIK
 
