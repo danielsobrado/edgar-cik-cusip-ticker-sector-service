@@ -124,7 +124,7 @@ Or the equivalent for MySQL:
 ```bash
 docker build -t edgar-mysql .
 docker volume create edgar-mysql-data
-docker run -d --name edgar-mysql -p 3306:3306 -v edgar-mysql-data:/var/lib/mysql mysql:latest
+docker run -d --name edgar-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -v edgar-mysql-data:/var/lib/mysql mysql:latest
 ```
 
 Note: The performance of batch updates is much better, MySQL has issues with identity IDs for batch and Postgres does not.
@@ -275,6 +275,8 @@ See:
 As the form isn't submitted until 45 days following the end of the quarter, a lot might change regarding investments during that time. It's also possible that by this point, the projected price changes have already taken place.
 
 Even with holdings information, it might be challenging to determine an asset manager's net position. A fund may be net long, net short, or more likely have a limited pay-off if it discloses holding long positions in the shares, put options, and call options. Moreover, there may be unlisted positions that call for longs in the underlying security while the manager retains a net short exposure or an investor may be partially hedged, such as short positions in convertible bonds.
+
+This code is not production ready, passwords are in clear text, additional logging is required. Portions of the code have been generated using AI (e.g copilot and GPT4).
 
 Please feel free to contact me if you have any questions or suggestions.
 
