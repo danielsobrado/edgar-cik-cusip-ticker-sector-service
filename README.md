@@ -1,4 +1,4 @@
-# Edgar CIK/CUSIP downloader and enricher
+# Sec's Edgar Ticker downloader and enricher with CIK, CUSIP and SIC mappings
 This project is a Spring Boot-based service that downloads and updates CIK (Central Index Key) data from the SEC (U.S. Securities and Exchange Commission) for public companies. 
 
 The service stores the CIK data in a RDBMS (e.g. MySQL) database and supports enrichment with stock exchange information.
@@ -122,7 +122,7 @@ docker run -d --name edgar-postgres -p 5432:5432 -v edgar-postgres-data:/var/lib
 Or the equivalent for MySQL:
 
 ```bash
-docker edgar-mysql .
+docker build -t edgar-mysql .
 docker volume create edgar-mysql-data
 docker run -d --name edgar-mysql -p 3306:3306 -v edgar-mysql-data:/var/lib/mysql mysql:latest
 ```
