@@ -110,6 +110,13 @@ And the following connection string in your `application.properties`.
 
 `jdbc:postgresql://localhost:5432/edgar`
 
+To build and start a database container, you can use the following commands from `/scripts/postgres`:
+
+```bash
+docker build -t edgar-db .
+docker run -d --name edgar-db -p 5432:5432 edgar-db
+```
+
 Note: The performance of batch updates is much better, MySQL has issues with identity IDs for batch and Postgres does not.
 
 After an initial execution you can see that the main table gets populated:
@@ -218,6 +225,10 @@ Using configuration we can determine whether to enable this service or not.
 The number of unenriched records in the system will be counted by another scheduled activity, which will run once every day. The previous scrapper won't need to be run if there are no records to be enriched.
 
 ![Diagram 2](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/22dffc0865942e39cce197e3ce53a1981631710f/doc/images/Diagram2.PNG)
+
+There are other fields that can be enriched from the filings:
+
+![Enrich from filings](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/22dffc0865942e39cce197e3ce53a1981631710f/doc/images/Diagram2.PNG)
 
 ### Error Cases for Enriching CIK
 

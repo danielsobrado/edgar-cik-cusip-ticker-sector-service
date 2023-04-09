@@ -1,0 +1,7 @@
+CREATE DATABASE edgar;
+
+CREATE USER edgar_user WITH ENCRYPTED PASSWORD 'password';
+
+GRANT ALL PRIVILEGES ON DATABASE edgar TO edgar_user;
+
+ALTER USER edgar_user CREATEDB;
