@@ -52,7 +52,8 @@ A cron expression is used to schedule the CIK data update process.
 
 ## Requirements
 * Java 17
-* MySQL 8
+* MySQL 8 or Postgres
+* Optional: Docker
 
 ## Configuration
 All the configuration settings can be found in the `src/main/resources/application.yml` file. You can change the following properties:
@@ -113,8 +114,17 @@ And the following connection string in your `application.properties`.
 To build and start a database container, you can use the following commands from `/scripts/postgres`:
 
 ```bash
-docker build -t edgar-db .
-docker run -d --name edgar-db -p 5432:5432 edgar-db
+docker build -t edgar-postgres .
+docker volume create edgar-postgres-data
+docker run -d --name edgar-postgres -p 5432:5432 -v edgar-postgres-data:/var/lib/postgresql/data postgres:latest
+```
+
+Or the equivalent for MySQL:
+
+```bash
+docker edgar-mysql .
+docker volume create edgar-mysql-data
+docker run -d --name edgar-mysql -p 3306:3306 -v edgar-mysql-data:/var/lib/mysql mysql:latest
 ```
 
 Note: The performance of batch updates is much better, MySQL has issues with identity IDs for batch and Postgres does not.
@@ -259,8 +269,6 @@ The `enrichCik` method handles various scenarios when enriching a CIK. The follo
 See:
 
 ![Logs](https://github.com/danielsobrado/edgar-cik-ticker-service/blob/692b99d2d86680d1e86ea77ad3557d6cd33474f1/doc/images/LogsEdgarUpdate.PNG)
-
-Disclaimer: I used chatGPT extensively for this project.
 
 ## Final notes
 
